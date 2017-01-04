@@ -63,14 +63,17 @@ public class CurrentBranchTask extends AbstractGitRepoAwareTask {
         protected void doExecute() {
                 try {
                         Repository repository = git.getRepository();
-                        ObjectId objectId = repository.getRef(Constants.HEAD).getObjectId();
                         String branch = repository.getBranch();
                         // Backward compatibility
-						getProject().setProperty(outputProperty, branch);
+                        getProject().setProperty(outputProperty, branch);
+
+                        ObjectId objectId = repository.getRef(Constants.HEAD).getObjectId();
 						// Extended (nested) properties
-						getProject().setProperty(outputProperty + ".name", branch);
-						getProject().setProperty(outputProperty + ".id", objectId.name());
-                        getProject().setProperty(outputProperty + ".shortId", objectId.abbreviate(8).name());
+                        if(objectId != null) {
+							getProject().setProperty(outputProperty + ".name", branch);
+							getProject().setProperty(outputProperty + ".id", objectId.name());
+	                        getProject().setProperty(outputProperty + ".shortId", objectId.abbreviate(8).name());
+                        }
                 } catch (IOException e) {
                         throw new GitBuildException("Could not query the current branch.", e);
                 }
